@@ -14,7 +14,7 @@
             border-radius: 10px; 
             position: relative;
             margin: 10px;
-            height: 200px;
+            height: 220px;
             overflow: hidden;
         }
         .speech-bubble {
@@ -25,9 +25,17 @@
             background: white;
             border: 2px black solid;
             border-radius: 20px;
-            padding: 10px;
+            padding: 8px 12px;
             font-weight: bold;
             font-size: 14px;
+            max-height: 60px;
+            overflow: hidden;
+        }
+        .character-svg {
+            width: 80px;
+            height: 100px;
+            margin: 10px auto;
+            display: block;
         }
         .comic-container {
             max-height: 70vh;
@@ -42,49 +50,69 @@
 <body class="bg-gradient-to-br from-blue-100 to-purple-200 min-h-screen p-4">
     <!-- Page 1: Prompt Input -->
     <div id="promptPage" class="page active max-w-md mx-auto bg-white rounded-xl shadow-xl p-8">
-        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">Text to Comic</h1>
-        <textarea id="promptInput" class="w-full p-4 border-2 border-gray-300 rounded-lg resize-vertical min-h-[200px] text-lg focus:outline-none focus:border-blue-500" placeholder="Enter your story text here...&#10;&#10;Example: A brave knight finds a magic sword in the forest. He fights a dragon and saves the village."></textarea>
-        <button onclick="generateComic()" class="w-full mt-6 bg-blue-500 text-white py-4 px-6 rounded-lg text-xl font-bold hover:bg-blue-600 transition duration-300">Create Comic</button>
+        <h1 class="text-3xl font-bold text-center mb-8 text-gray-800">📖 Text to Comic</h1>
+        <textarea id="promptInput" class="w-full p-4 border-2 border-gray-300 rounded-lg resize-vertical min-h-[200px] text-lg focus:outline-none focus:border-blue-500" placeholder="Enter your story here...&#10;&#10;Ex: A brave knight finds a magic sword. He fights a dragon. The village cheers!"></textarea>
+        <button onclick="generateComic()" class="w-full mt-6 bg-gradient-to-r from-blue-500 to-purple-500 text-white py-4 px-6 rounded-lg text-xl font-bold hover:from-blue-600 hover:to-purple-600 transition duration-300 shadow-lg">✨ Create Comic</button>
+        <p class="text-sm text-gray-500 mt-4 text-center">Works offline! Max 45 pages.</p>
     </div>
 
-    <!-- Page 2: Comic Viewer + Controls -->
+    <!-- Page 2: Comic Viewer -->
     <div id="comicPage" class="page max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-8">
-        <div class="flex justify-between items-center mb-6">
-            <button onclick="backToPrompt()" class="text-2xl">← Back</button>
-            <h1 class="text-3xl font-bold text-center">Your Comic</h1>
-            <button id="doneBtn" onclick="saveComic()" class="text-3xl text-green-500">✅ Done</button>
+        <div class="flex justify-between items-center mb-6 sticky top-0 bg-white py-2">
+            <button onclick="backToPrompt()" class="text-2xl font-bold text-gray-700 hover:text-gray-900">← Back</button>
+            <h1 class="text-3xl font-bold text-center text-gray-800">Your Comic Book</h1>
+            <button id="doneBtn" onclick="saveComic()" class="text-3xl text-green-500 hover:text-green-600 font-bold">✅ Save</button>
         </div>
         
-        <div id="comicContainer" class="comic-container mb-6">
-            <!-- Panels will be added here -->
+        <div id="comicContainer" class="comic-container mb-8">
+            <!-- Panels added here -->
         </div>
 
         <!-- Settings -->
-        <div class="bg-gray-100 p-4 rounded-lg mb-6">
-            <h2 class="text-xl font-bold mb-4">Settings</h2>
-            <div class="flex gap-4 items-center flex-wrap">
-                <label class="flex items-center gap-2">
-                    <input type="checkbox" id="enableAudio" checked>
-                    <span>Add Audio Narration</span>
+        <div class="bg-gradient-to-r from-gray-100 to-gray-200 p-6 rounded-xl sticky bottom-4 shadow-lg">
+            <h2 class="text-2xl font-bold mb-4 text-gray-800">⚙️ Settings</h2>
+            <div class="flex flex-wrap gap-4 items-center justify-center">
+                <label class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-md">
+                    <input type="checkbox" id="enableAudio" checked class="w-5 h-5">
+                    <span class="font-semibold">🔊 Audio Narration</span>
                 </label>
-                <button id="addPageBtn" onclick="addPage()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">+ New Page</button>
-                <span id="pageCount" class="font-bold">Page 1 / 45</span>
+                <button id="addPageBtn" onclick="addPage()" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-bold shadow-md transition">+ New Page</button>
+                <span id="pageCount" class="font-bold text-xl bg-blue-100 px-4 py-2 rounded-full">Page 1 / 45</span>
             </div>
         </div>
     </div>
 
     <!-- Share Page -->
-    <div id="sharePage" class="page max-w-md mx-auto bg-white rounded-xl shadow-xl p-8">
-        <h1 class="text-3xl font-bold text-center mb-8">Comic Saved!</h1>
-        <div id="comicPreview" class="mb-8"></div>
-        <button onclick="shareComic()" class="w-full bg-green-500 text-white py-4 px-6 rounded-lg text-xl font-bold hover:bg-green-600 mb-4 transition duration-300">Share Comic</button>
-        <button onclick="backToPrompt()" class="w-full bg-gray-500 text-white py-4 px-6 rounded-lg text-xl font-bold hover:bg-gray-600 transition duration-300">New Comic</button>
+    <div id="sharePage" class="page max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-8 max-h-screen overflow-y-auto">
+        <h1 class="text-3xl font-bold text-center mb-8 text-green-600">🎉 Comic Saved Successfully!</h1>
+        <div id="comicPreview" class="comic-container mb-8 max-h-96"></div>
+        <div class="flex gap-4 justify-center">
+            <button onclick="shareComic()" class="bg-green-500 hover:bg-green-600 text-white py-4 px-8 rounded-lg text-xl font-bold shadow-lg transition flex items-center gap-2">
+                📱 Share Comic
+            </button>
+            <button onclick="backToPrompt()" class="bg-blue-500 hover:bg-blue-600 text-white py-4 px-8 rounded-lg text-xl font-bold shadow-lg transition">
+                ➕ New Comic
+            </button>
+        </div>
     </div>
 
     <script>
         let pages = [];
         let currentPageIndex = 0;
         const maxPages = 45;
+
+        // Simple SVG character generator (works offline!)
+        function createCharacterSVG(type = 'happy') {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#f0932b'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            let face = '';
+            if (type === 'happy') {
+                face = `<circle cx="40" cy="35" r="3" fill="#333"/><circle cx="60" cy="35" r="3" fill="#333"/><path d="M35 50 Q50 60 65 50" stroke="#333" stroke-width="2" fill="none"/>`;
+            } else if (type === 'sad') {
+                face = `<circle cx="40" cy="40" r="3" fill="#333"/><circle cx="60" cy="40" r="3" fill="#333"/><path d="M35 55 Q50 65 65 55" stroke="#333" stroke-width="2" fill="none" transform="scale(1,1.2)"/>`;
+            }
+            return `<svg viewBox="0 0 100 120" class="character-svg"><rect x="20" y="10" width="60" height="70" rx="30" fill="${color}" stroke="#333" stroke-width="3"/><circle cx="30" cy="25" r="8" fill="#fff"/><circle cx="70" cy="25" r="8" fill="#fff"/><circle cx="30" cy="25" r="4" fill="#333"/><circle cx="70" cy="25" r="4" fill="#333"/>${face}<path d="M20 80 L50 100 L80 80" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/></svg>`;
+        }
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -93,17 +121,23 @@
 
         function generateComic() {
             const text = document.getElementById('promptInput').value.trim();
-            if (!text) return alert('Please enter some text!');
+            if (!text) {
+                alert('😊 Please enter your story text!');
+                return;
+            }
 
-            // Simple sentence splitting for panels
-            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
-            pages = [];
+            // Better sentence splitting: split on . ! ? but keep words together
+            const sentences = text.replace(/([.!?]+)/g, '$1|').split('|').map(s => s.trim()).filter(s => s.length > 5);
             
-            // Create up to 6 panels per page initially
+            pages = [];
             const panelsPerPage = 6;
             for (let i = 0; i < sentences.length; i += panelsPerPage) {
-                const pageSentences = sentences.slice(i, i + panelsPerPage);
-                pages.push(pageSentences.map(sentence => sentence.trim()));
+                pages.push(sentences.slice(i, i + panelsPerPage));
+            }
+
+            if (pages.length === 0) {
+                alert('Story too short! Add more sentences.');
+                return;
             }
 
             currentPageIndex = 0;
@@ -113,104 +147,87 @@
 
         function renderCurrentPage() {
             const container = document.getElementById('comicContainer');
-            const page = pages[currentPageIndex];
+            const page = pages[currentPageIndex] || [];
             
             container.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-items-center">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     ${page.map((text, idx) => `
-                        <div class="panel w-full max-w-sm">
-                            <div class="w-full h-full bg-gradient-to-br from-yellow-100 to-orange-100 flex items-center justify-center p-4 text-center relative">
-                                <img src="https://api.gramener.com/comicgen/v1/comic?name=dee&angle=straight&emotion=happy&pose=normal" 
-                                     alt="Comic character" class="w-24 h-24 mx-auto mb-2 rounded-full shadow-lg">
-                                <div class="speech-bubble">${text.substring(0, 80)}${text.length > 80 ? '...' : ''}</div>
-                            </div>
+                        <div class="panel bg-gradient-to-br from-yellow-50 to-orange-50 hover:shadow-xl transition">
+                            ${createCharacterSVG(idx % 2 ? 'happy' : 'sad')}
+                            <div class="speech-bubble">${text.substring(0, 100)}${text.length > 100 ? '...' : ''}</div>
                         </div>
                     `).join('')}
                 </div>
             `;
 
-            document.getElementById('pageCount').textContent = `Page ${currentPageIndex + 1} / ${pages.length}`;
-            if (pages[currentPageIndex].join(' ').trim()) {
-                if (document.getElementById('enableAudio').checked) {
-                    speakPage();
-                }
-            }
+            document.getElementById('pageCount').textContent = `Page ${currentPageIndex + 1} / ${Math.min(pages.length, maxPages)}`;
         }
 
         function addPage() {
-            if (pages.length >= maxPages) return alert('Maximum 45 pages reached!');
-            pages.push(['New panel text...']);
+            if (pages.length >= maxPages) {
+                alert(`Max ${maxPages} pages reached!`);
+                return;
+            }
+            pages.push(['Add text to this new panel... Click Save to edit!']);
             currentPageIndex = pages.length - 1;
             renderCurrentPage();
         }
 
         function speakPage() {
-            const text = pages[currentPageIndex].map(p => p.replace(/<[^>]*>/g, '')).join('. ');
+            const text = pages[currentPageIndex].map(p => p.replace(/[^ws.,!?]/g, '')).join('. ');
+            if (speechSynthesis.speaking) speechSynthesis.cancel();
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.8;
-            utterance.pitch = 1.1;
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
             speechSynthesis.speak(utterance);
         }
 
         function saveComic() {
-            const comicHTML = `
-                <html>
-                <head><title>My Comic</title>
-                <script src="https://cdn.tailwindcss.com"></script>
-                <style>
-                    .panel { border: 3px black solid; border-radius: 10px; margin: 10px; height: 250px; }
-                    .speech-bubble { position: absolute; bottom: 10px; left: 10px; right: 10px; background: white; border: 2px black solid; border-radius: 20px; padding: 10px; font-weight: bold; }
-                </style></head>
-                <body class="p-8 bg-gray-100">${document.getElementById('comicContainer').innerHTML}</body>
-                </html>
-            `;
+            const fullComic = pages.map((page, pidx) => 
+                `<div class="page-${pidx}"><h3>Page ${pidx+1}</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${page.map((text, idx) => `<div class="panel">${createCharacterSVG()} <div class="speech-bubble">${text}</div></div>`).join('')}</div>`
+            ).join('');
+            
+            const comicHTML = `<!DOCTYPE html><html><head><title>My Comic Book</title><script src="https://cdn.tailwindcss.com"></script><style>.panel{border:3px solid black;border-radius:10px;height:250px;margin:10px;position:relative;}.speech-bubble{position:absolute;bottom:10px;left:10px;right:10px;background:white;border:2px solid black;border-radius:20px;padding:10px;font-weight:bold;}.character-svg{width:100px;height:120px;margin:10px auto;display:block;}</style></head><body class="p-8 bg-gradient-to-br from-blue-100 to-purple-200">${fullComic}</body></html>`;
             
             const blob = new Blob([comicHTML], {type: 'text/html'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'my-comic.html';
+            a.download = `my-comic-book-${Date.now()}.html`;
+            document.body.appendChild(a);
             a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
             
-            // Show preview on share page
-            document.getElementById('comicPreview').innerHTML = document.getElementById('comicContainer').innerHTML;
+            document.getElementById('comicPreview').innerHTML = container.innerHTML;
             showPage('sharePage');
         }
 
         function shareComic() {
             if (navigator.share) {
-                navigator.share({
-                    title: 'My Comic',
-                    text: 'Check out my comic!',
-                    url: window.location.href
-                });
+                navigator.share({title: 'My Comic Book', text: 'Check out my awesome comic!', url: window.location.href});
             } else {
-                alert('Link copied! Share: ' + window.location.href);
+                navigator.clipboard.writeText(window.location.href).then(() => alert('📋 Link copied! Share it anywhere.'));
             }
         }
 
         function backToPrompt() {
             showPage('promptPage');
+            document.getElementById('promptInput').focus();
         }
 
-        // Event listeners
-        document.getElementById('enableAudio').addEventListener('change', function() {
-            if (this.checked) speakPage();
-            else speechSynthesis.cancel();
+        // Events
+        document.getElementById('enableAudio').addEventListener('change', speakPage);
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('comicPage').classList.contains('active')) return;
+            if (e.key === 'ArrowLeft' && currentPageIndex > 0) { currentPageIndex--; renderCurrentPage(); }
+            else if (e.key === 'ArrowRight' && currentPageIndex < pages.length - 1) { currentPageIndex++; renderCurrentPage(); }
         });
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (document.getElementById('comicPage').classList.contains('active')) {
-                if (e.key === 'ArrowLeft' && currentPageIndex > 0) {
-                    currentPageIndex--;
-                    renderCurrentPage();
-                } else if (e.key === 'ArrowRight' && currentPageIndex < pages.length - 1) {
-                    currentPageIndex++;
-                    renderCurrentPage();
-                }
-            }
+        // Auto-enter on prompt
+        document.getElementById('promptInput').addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') generateComic();
         });
     </script>
 </body>
-</html>
+    </html>
